@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical">
+	<mx:Script>
+		<![CDATA[
+			import com.effectiveui.services.IncomingMessageEvent;
+			import com.effectiveui.services.TwoWayConnection;
+			import mx.controls.Alert;
+			import mx.utils.UIDUtil;
+			import com.effectiveui.vo.UserVO;
+			import mx.collections.ArrayCollection;
+			
+			private var socketSend:LocalConnection;
+			private var socketReceive:LocalConnection;
+			
+			[Bindable]
+			private var users:ArrayCollection = new ArrayCollection();
+			
+			private var socket:TwoWayConnection;
+			
+			private function listen():void {
+				socket = new TwoWayConnection("simpleserver");	
+				socket.listen();
+				socket.addEventListener("getEntity",getEntity);
+			}
+
+			//called by client request from socket
+			public function getEntity(e:IncomingMessageEvent):void {
+				var id:String = e.args as String;
+				Alert.show("getEntity called with id " + id);
+				var u:UserVO = findUser(id);
+				if (u) {
+					socket.send("updateObject",u);
+				}
+			}
+			
+			private function findUser(id:String):UserVO {
+				for each (var u:UserVO in users) {
+					if (u.id == id) return u;
+				}
+				return null;
+			}
+			
+			private function updateUser():void {
+				var u:UserVO = findUser(userid.text);
+				var newUser:Boolean = false;
+				if (!u) {
+					u = new UserVO();
+					newUser = true;
+				}
+				u.id = userid.text;
+				u.username = username.text;
+				u.firstname = firstname.text;
+				u.lastname = lastname.text;
+				if (newUser) {
+					users.addItem(u);	
+				} else {
+					users.refresh();
+				}
+				socket.send("updateObject",u);
+			}
+
+		]]>
+	</mx:Script>
+	
+	<mx:Button label="Begin Listening" click="listen()"/>
+	
+	<mx:HBox width="100%" height="50%">
+		<mx:VBox>
+			<mx:Form>
+				<mx:FormHeading label="Add/Update User"/>
+				<mx:FormItem label="User ID">
+					<mx:TextInput id="userid" text="1"/>
+				</mx:FormItem>
+				<mx:FormItem label="Username">
+					<mx:TextInput id="username" text="zpinter"/>
+				</mx:FormItem>
+				<mx:FormItem label="First Name">
+					<mx:TextInput id="firstname" text="Zachary"/>
+				</mx:FormItem>
+				<mx:FormItem label="Last Name">
+					<mx:TextInput id="lastname" text="Pinter"/>
+				</mx:FormItem>
+			</mx:Form>
+			<mx:Button label="Add/Update" click="updateUser()"/>
+		</mx:VBox>
+	</mx:HBox>
+	
+	<mx:List dataProvider="{users}" width="100%" height="50%">
+		
+	</mx:List>
+	
+</mx:WindowedApplication>

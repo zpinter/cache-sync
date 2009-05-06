@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flexLibProperties version="1">
+<includeClasses>
+<classEntry path="com.effectiveui.services.IncomingMessageEvent"/>
+<classEntry path="com.effectiveui.vo.UserVO"/>
+<classEntry path="com.effectiveui.services.TwoWayConnection"/>
+<classEntry path="com.effectiveui.vo.BaseVO"/>
+<classEntry path="com.effectiveui.vo.AddressVO"/>
+</includeClasses>
+<includeResources/>
+<namespaceManifests/>
+</flexLibProperties>

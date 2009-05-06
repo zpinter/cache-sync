@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" applicationComplete="onAppComplete()">
+	<mx:Script>
+		<![CDATA[
+			import com.effectiveui.vo.UserVO;
+			import com.effectiveui.services.IncomingMessageEvent;
+			import com.effectiveui.services.TwoWayConnection;
+			import com.effectiveui.services.GetEntitiesService;
+			import com.effectiveui.vo.BaseVO;
+			import com.effectiveui.cache.EntityCache;
+			import com.effectiveui.cache.EntityWrapper;
+			
+			[Bindable]
+			private var userWrapper:EntityWrapper;
+			private var ec:EntityCache = EntityCache.getInstance();
+			private var socket:TwoWayConnection;
+			private var klassesToCompile:Array = [UserVO];
+			
+			private function onAppComplete():void {
+				socket = new TwoWayConnection("flexcachedemo");
+				socket.addEventListener("updateObject",updateObject);
+				GetEntitiesService.getInstance().socket = socket;
+			}
+			
+			private function connectToServer():void {
+				socket.connectToServer("simpleserver");
+			}
+			
+			public function updateObject(e:IncomingMessageEvent):void {
+				var obj:BaseVO = e.args as BaseVO;
+				ec.updateEntity(obj);
+			}
+			
+			private function fetchUser():void {
+				userWrapper = ec.getEntity(userid.text);
+			}
+		]]>
+	</mx:Script>	
+	
+	<mx:Button label="Connect to Server" click="connectToServer()"/>
+	<mx:Form>
+		<mx:FormHeading label="Fetch a User"/>
+		<mx:FormItem label="User Id">
+			<mx:TextInput id="userid"/>
+		</mx:FormItem>
+		<mx:Button label="fetch" click="fetchUser()"/>
+	</mx:Form>
+	
+	<mx:Spacer height="20"/>
+	
+	<mx:Label text="User Id: {userWrapper.entityId}"/>
+	<mx:Label text="Username: {userWrapper.entity.username}"/>
+	<mx:Label text="First Name: {userWrapper.entity.firstname}"/>
+	<mx:Label text="Last Name: {userWrapper.entity.lastname}"/>
+</mx:Application>
