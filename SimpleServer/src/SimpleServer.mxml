@@ -26,7 +26,7 @@
 			//called by client request from socket
 			public function getEntity(e:IncomingMessageEvent):void {
 				var id:String = e.args as String;
-				Alert.show("getEntity called with id " + id);
+				//Alert.show("getEntity called with id " + id);
 				var u:UserVO = findUser(id);
 				if (u) {
 					socket.send("updateObject",u);
